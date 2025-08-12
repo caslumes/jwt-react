@@ -4,11 +4,11 @@ import axios from "axios";
 import CustomButton from "./components/CustomButton";
 import LoginForm from "./components/LoginForm";
 import { Trash } from "lucide-react";
+import UsersTable from "./components/UsersTable";
 
 function App() {
     const [users, setUsers] = useState([]);
-    const [currentUser, setCurrentUser] = useState();
-    const [isLoggedIn, setIsLoggedIn] = useState(false);
+    const [currentUser, setCurrentUser] = useState(null);
 
     const apiUrl = "http://localhost:8080/api";
     const loginUrl = `${apiUrl}/login`;
@@ -46,7 +46,6 @@ function App() {
 
                 console.log(res.data.user);
 
-                setIsLoggedIn(true);
                 setCurrentUser(res.data.user);
 
                 usernameInputRef.current.value = "";
@@ -97,7 +96,7 @@ function App() {
     return (
         <>
             <div className="flex flex-col items-center gap-5 pt-5">
-                {isLoggedIn ? (
+                {currentUser !== null ? (
                     <>
                         <p>Voce é o {currentUser.name}</p>
                     </>
@@ -112,38 +111,11 @@ function App() {
                 <CustomButton onClick={handleGetUsersButtonClick}>
                     MOSTRAR USUARIOS
                 </CustomButton>
-                <table className="w-[50%]">
-                    <thead>
-                        <tr>
-                            <th>ID</th>
-                            <th>Nome</th>
-                            <th>Nome de usuário</th>
-                            <th></th>
-                        </tr>
-                    </thead>
-                    <tbody className="text-center">
-                        {users.map((user) => (
-                            <tr key={user.id}>
-                                <td>{user.id}</td>
-                                <td>{user.name}</td>
-                                <td>{user.username}</td>
-                                {currentUser.roles[0].name ===
-                                "ROLE_USER" ? null : (
-                                    <td>
-                                        <button
-                                            onClick={() =>
-                                                handleDeleteUser(user.id)
-                                            }
-                                            className="cursor-pointer hover:bg-black/25 p-1 rounded-full"
-                                        >
-                                            <Trash />
-                                        </button>
-                                    </td>
-                                )}
-                            </tr>
-                        ))}
-                    </tbody>
-                </table>
+                <UsersTable
+                    users={users}
+                    currentUser={currentUser}
+                    handleDeleteUser={handleDeleteUser}
+                />
             </div>
         </>
     );
