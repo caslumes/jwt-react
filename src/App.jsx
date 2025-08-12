@@ -7,6 +7,7 @@ import { Trash } from "lucide-react";
 
 function App() {
     const [users, setUsers] = useState([]);
+    const [currentUser, setCurrentUser] = useState();
     const [isLoggedIn, setIsLoggedIn] = useState(false);
 
     const apiUrl = "http://localhost:8080/api";
@@ -43,7 +44,10 @@ function App() {
                     "Authorization"
                 ] = `Bearer ${accessToken.current}`;
 
+                console.log(res.data.user);
+
                 setIsLoggedIn(true);
+                setCurrentUser(res.data.user);
 
                 usernameInputRef.current.value = "";
                 passwordInputRef.current.value = "";
@@ -93,7 +97,11 @@ function App() {
     return (
         <>
             <div className="flex flex-col items-center gap-5 pt-5">
-                {isLoggedIn ? null : (
+                {isLoggedIn ? (
+                    <>
+                        <p>Voce é o {currentUser.name}</p>
+                    </>
+                ) : (
                     <LoginForm
                         handleLogin={handleLogin}
                         usernameInputRef={usernameInputRef}
@@ -119,16 +127,19 @@ function App() {
                                 <td>{user.id}</td>
                                 <td>{user.name}</td>
                                 <td>{user.username}</td>
-                                <td>
-                                    <button
-                                        onClick={() =>
-                                            handleDeleteUser(user.id)
-                                        }
-                                        className="cursor-pointer hover:bg-black/25 p-1 rounded-full"
-                                    >
-                                        <Trash />
-                                    </button>
-                                </td>
+                                {currentUser.roles[0].name ===
+                                "ROLE_USER" ? null : (
+                                    <td>
+                                        <button
+                                            onClick={() =>
+                                                handleDeleteUser(user.id)
+                                            }
+                                            className="cursor-pointer hover:bg-black/25 p-1 rounded-full"
+                                        >
+                                            <Trash />
+                                        </button>
+                                    </td>
+                                )}
                             </tr>
                         ))}
                     </tbody>
