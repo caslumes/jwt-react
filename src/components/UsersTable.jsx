@@ -1,3 +1,5 @@
+import { Trash } from "lucide-react";
+
 function UsersTable({ users, currentUser, handleDeleteUser }) {
     return (
         <table className="w-[50%]">

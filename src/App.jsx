@@ -1,66 +1,25 @@
-import { useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import "./App.css";
 import axios from "axios";
 import CustomButton from "./components/CustomButton";
-import LoginForm from "./components/LoginForm";
-import { Trash } from "lucide-react";
 import UsersTable from "./components/UsersTable";
+import { useNavigate } from "react-router-dom";
+import { useAuth } from "./components/AuthProvider";
 
 function App() {
+    const navigate = useNavigate();
+    const auth = useAuth();
+
     const [users, setUsers] = useState([]);
-    const [currentUser, setCurrentUser] = useState(null);
 
-    const apiUrl = "http://localhost:8080/api";
-    const loginUrl = `${apiUrl}/login`;
+    const apiUrl = "https://localhost:8080/api";
     const usersUrl = `${apiUrl}/users`;
-    const accessToken = useRef(null);
 
-    const usernameInputRef = useRef();
-    const passwordInputRef = useRef();
-
-    const handleLogin = (e) => {
-        e.preventDefault();
-
-        const username = usernameInputRef.current.value;
-        const password = passwordInputRef.current.value;
-
-        login(username, password);
-    };
-
-    const login = (username, password) => {
-        const formData = new FormData();
-        formData.append("username", username);
-        formData.append("password", password);
-
-        axios
-            .post(loginUrl, formData, {
-                headers: {
-                    "Content-Type": "multipart/form-data",
-                },
-            })
-            .then((res) => {
-                accessToken.current = res.data.access_token;
-                axios.defaults.headers.common[
-                    "Authorization"
-                ] = `Bearer ${accessToken.current}`;
-
-                console.log(res.data.user);
-
-                setCurrentUser(res.data.user);
-
-                usernameInputRef.current.value = "";
-                passwordInputRef.current.value = "";
-
-                console.log("Login successful");
-            })
-            .catch((err) => {
-                if (err.response === undefined) {
-                    console.error(err);
-                    return;
-                }
-                console.error("Error when logging in: ", err.response.data);
-            });
-    };
+    useEffect(() => {
+        if (auth.userData === null) {
+            navigate("/login");
+        }
+    });
 
     const handleGetUsersButtonClick = () => {
         fetchUsers();
@@ -93,30 +52,26 @@ function App() {
             });
     };
 
+    const handleLogout = () => {
+        auth.logout();
+    };
+
     return (
         <>
-            <div className="flex flex-col items-center gap-5 pt-5">
-                {currentUser !== null ? (
-                    <>
-                        <p>Voce é o {currentUser.name}</p>
-                    </>
-                ) : (
-                    <LoginForm
-                        handleLogin={handleLogin}
-                        usernameInputRef={usernameInputRef}
-                        passwordInputRef={passwordInputRef}
+            <button onClick={handleLogout}>SAIR</button>
+            {auth.userData !== null ? (
+                <div className="flex flex-col items-center gap-5 pt-5">
+                    <p>Voce é o {auth.userData.name}</p>
+                    <CustomButton onClick={handleGetUsersButtonClick}>
+                        MOSTRAR USUARIOS
+                    </CustomButton>
+                    <UsersTable
+                        users={users}
+                        currentUser={auth.userData}
+                        handleDeleteUser={handleDeleteUser}
                     />
-                )}
-
-                <CustomButton onClick={handleGetUsersButtonClick}>
-                    MOSTRAR USUARIOS
-                </CustomButton>
-                <UsersTable
-                    users={users}
-                    currentUser={currentUser}
-                    handleDeleteUser={handleDeleteUser}
-                />
-            </div>
+                </div>
+            ) : null}
         </>
     );
 }
