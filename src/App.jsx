@@ -4,7 +4,8 @@ import axios from "axios";
 import CustomButton from "./components/CustomButton";
 import UsersTable from "./components/UsersTable";
 import { useNavigate } from "react-router-dom";
-import { useAuth } from "./components/AuthProvider";
+import { useAuth } from "./core/auth/useAuth";
+import { ENDPOINTS } from "./core/api/api";
 
 function App() {
     const navigate = useNavigate();
@@ -12,8 +13,7 @@ function App() {
 
     const [users, setUsers] = useState([]);
 
-    const apiUrl = "https://localhost:8080/api";
-    const usersUrl = `${apiUrl}/users`;
+    const usersUrl = ENDPOINTS.USERS;
 
     useEffect(() => {
         if (auth.userData === null) {

@@ -1,10 +1,10 @@
 import { useEffect, useRef } from "react";
-import { useAuth } from "../components/AuthProvider";
+import { useAuth } from "../core/auth/useAuth";
 import LoginForm from "../components/LoginForm";
 import { useNavigate } from "react-router-dom";
 
 function LoginPage() {
-    const auth = useAuth();
+    const {login, userData} = useAuth();
     const navigate = useNavigate();
 
     const usernameInputRef = useRef();
@@ -16,11 +16,11 @@ function LoginPage() {
         const username = usernameInputRef.current.value;
         const password = passwordInputRef.current.value;
 
-        auth.login(username, password);
+        login(username, password);
     };
 
     useEffect(() => {
-        if (auth.userData !== null && auth.userData !== undefined) {
+        if (userData !== null && userData !== undefined) {
             navigate("/");
         }
     });

@@ -4,7 +4,7 @@ import "./index.css";
 import App from "./App.jsx";
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import LoginPage from "./pages/LoginPage";
-import AuthProvider from "./components/AuthProvider";
+import { AuthProvider } from "./core/auth/AuthProvider";
 
 const router = createBrowserRouter([
     { path: "/", element: <App /> },

@@ -1,23 +1,12 @@
 import axios from "axios";
-import { createContext, useContext, useLayoutEffect, useState } from "react";
+import { useLayoutEffect, useState } from "react";
+import { AuthContext } from "./AuthContext";
+import { ENDPOINTS } from "../api/api";
 
-const AuthContext = createContext(undefined);
-
-export const useAuth = () => {
-    const authContext = useContext(AuthContext);
-
-    if (!authContext) {
-        throw new Error("useAuth must be used within a AuthProvider");
-    }
-
-    return authContext;
-};
-
-const AuthProvider = ({ children }) => {
-    const apiUrl = "https://localhost:8080/api";
-    const loginUrl = `${apiUrl}/login`;
-    const refreshUrl = `${apiUrl}/token/refresh`;
-    const usersUrl = `${apiUrl}/users`;
+export const AuthProvider = ({ children }) => {
+    const loginUrl = ENDPOINTS.LOGIN;
+    const refreshUrl = ENDPOINTS.REFRESH_TOKEN;
+    const meUrl = ENDPOINTS.ME;
 
     const [token, setToken] = useState();
     const [userData, setUserData] = useState(null);
@@ -47,14 +36,14 @@ const AuthProvider = ({ children }) => {
     const logout = () => {
         setToken(null);
         setUserData(null);
-    }
+    };
 
     useLayoutEffect(() => {
         if (!token) {
             axios.get(refreshUrl, { withCredentials: true }).then((res) => {
                 setToken(res.data.access_token);
                 axios
-                    .get(`${usersUrl}/me`, {
+                    .get(meUrl, {
                         headers: {
                             Authorization: `Bearer ${res.data.access_token}`,
                         },
@@ -127,5 +116,3 @@ const AuthProvider = ({ children }) => {
         </AuthContext.Provider>
     );
 };
-
-export default AuthProvider;
