@@ -1,7 +1,7 @@
 function CustomButton(props) {
     return (
         <button
-            className="py-1 px-2 rounded-md font-bold bg-gray-400 hover:cursor-pointer"
+            className="py-2 px-4 rounded-md text-white font-bold bg-blue-800 hover:cursor-pointer"
             {...props}
         >
             {props.children}
